@@ -1,7 +1,9 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Take};
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
+
+#[cfg(unix)]
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 
 use crate::KeystoreError;
 
@@ -19,20 +21,41 @@ pub(crate) fn read_capped(path: &Path, cap: usize) -> Result<Vec<u8>, KeystoreEr
 pub(super) fn new_secret_file_options() -> OpenOptions {
     let mut options = OpenOptions::new();
     options.write(true).create_new(true);
+    #[cfg(unix)]
     set_secret_file_mode(&mut options);
     options
 }
 
+#[cfg(unix)]
 fn set_secret_file_mode(options: &mut OpenOptions) {
     options.mode(0o600);
 }
 
+#[cfg(not(unix))]
+fn set_secret_file_mode(_options: &mut OpenOptions) {
+    // no-op on non-unix
+}
+
 pub(super) fn set_owner_read_write(path: &Path) -> Result<(), KeystoreError> {
-    fs::set_permissions(path, fs::Permissions::from_mode(0o600))?;
+    #[cfg(unix)]
+    {
+        fs::set_permissions(path, fs::Permissions::from_mode(0o600))?;
+    }
+    #[cfg(not(unix))]
+    {
+        // ignore on non-unix
+    }
     Ok(())
 }
 
 pub(super) fn sync_directory(path: &Path) -> Result<(), KeystoreError> {
-    File::open(path)?.sync_all()?;
+    #[cfg(unix)]
+    {
+        File::open(path)?.sync_all()?;
+    }
+    #[cfg(not(unix))]
+    {
+        // ignore
+    }
     Ok(())
 }

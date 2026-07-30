@@ -29,6 +29,13 @@ val bashPath = if (System.getProperty("os.name").startsWith("Windows")) {
     "/bin/sh"
 }
 
+// Переменные окружения для задач
+val envVars = mapOf(
+    "PATH" to "C:\\Users\\maksm\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin;C:\\Users\\maksm\\.cargo\\bin;${System.getenv("PATH")}",
+    "TEMP" to System.getenv("TEMP"),
+    "TMP" to System.getenv("TMP")
+)
+
 android {
     namespace = "com.gemwallet.gemstone"
     compileSdk = 37
@@ -86,6 +93,7 @@ val bindgenKotlin = tasks.register<Exec>("bindgenKotlin") {
     inputs.file(gemstoneRoot.resolve("Cargo.toml"))
     outputs.dir(generatedKotlinDir.resolve("uniffi"))
     commandLine(bashPath, "-l", "-c", "just bindgen-kotlin")
+    environment = envVars
 }
 
 val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
@@ -97,6 +105,7 @@ val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
     inputs.property("cargoBuildFlag", cargoBuildFlag.orEmpty())
     outputs.dir(jniLibsDir)
     commandLine(bashPath, "-l", "-c", "cargo ndk $cargoNdkTargets -o ${jniLibsDir.absolutePath} build --lib ${cargoBuildFlag.orEmpty()}")
+    environment = envVars
 }
 
 tasks.configureEach {

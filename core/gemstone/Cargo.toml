@@ -15,7 +15,7 @@ bytes = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "4.0", features = ["derive"] }
 diesel = { version = "2.0", features = ["sqlite", "chrono", "returning_clauses_for_sqlite_3_35"] }
-diesel-async = { version = "0.4", features = ["sqlite", "bb8"] }
+# diesel-async = { version = "0.4", features = ["sqlite", "bb8"] }  # временно отключено для сборки
 dotenvy = "0.15"
 futures = "0.3"
 hex = "0.4"

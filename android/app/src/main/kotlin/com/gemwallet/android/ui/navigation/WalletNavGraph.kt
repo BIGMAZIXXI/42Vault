@@ -59,6 +59,9 @@ import com.gemwallet.android.ui.navigation.routes.walletSearchScreen
 import com.gemwallet.android.ui.navigation.routes.walletsScreen
 import com.wallet.core.primitives.PortfolioType
 import com.wallet.core.primitives.WalletId
+// Добавленный импорт для Vault
+import com.gemwallet.android.ui.navigation.routes.vaultScreen
+import com.gemwallet.android.ui.navigation.routes.vaultRoute
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -256,6 +259,11 @@ fun WalletNavGraph(
                 onOpenUrl = navigator::openNotificationUrl,
                 toastMessage = navigator::toastMessage,
                 onToastShown = navigator::clearToastMessage,
+            )
+
+            // Добавленный экран Vault
+            vaultScreen(
+                onCancel = onCancel,
             )
 
             contactsScreen(

@@ -53,8 +53,11 @@ import com.gemwallet.android.ui.navigation.WalletRootRoute
 import com.gemwallet.android.ui.navigation.routes.assetsRoute
 import com.gemwallet.android.ui.navigation.routes.settingsRoute
 import com.gemwallet.android.ui.navigation.routes.transactionsRoute
+import com.gemwallet.android.ui.navigation.routes.vaultRoute
 import com.gemwallet.android.ui.theme.alpha10
 import kotlinx.coroutines.launch
+// Импорт для VaultScreen
+import com.gemwallet.android.vault.VaultScreen
 
 @Composable
 fun MainScreen(
@@ -73,6 +76,7 @@ fun MainScreen(
     val assetsListState = rememberLazyListState()
     val activitiesListState = rememberLazyListState()
     val settingsScrollState = rememberScrollState()
+    val vaultScrollState = rememberScrollState() // для Vault, если понадобится
     val tabStateHolder = rememberSaveableStateHolder()
     val coroutineScope = rememberCoroutineScope()
     val scrollTabToTop: (String) -> Unit = { route ->
@@ -81,6 +85,7 @@ fun MainScreen(
                 assetsRoute -> assetsListState.animateScrollToItem(0)
                 transactionsRoute -> activitiesListState.animateScrollToItem(0)
                 settingsRoute -> settingsScrollState.animateScrollTo(0)
+                vaultRoute -> vaultScrollState.animateScrollTo(0)
             }
         }
     }
@@ -100,12 +105,19 @@ fun MainScreen(
             testTag = "activitiesTab",
         ),
         BottomNavItem(
+            label = "Vault", // TODO: заменить на строковый ресурс
+            icon = AppIcons.Shield, // Используем иконку щита, можно заменить на замок
+            route = vaultRoute,
+            testTag = "vaultTab",
+        ),
+        BottomNavItem(
             label = stringResource(R.string.settings_title),
             icon = AppIcons.Settings,
             route = settingsRoute,
             testTag = "settingsTab",
         ),
     )
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
@@ -172,62 +184,63 @@ fun MainScreen(
     ) {
         Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding())) {
             CompositionLocalProvider(LocalConnectionBannerHandled provides true) {
-            AnimatedContent(
-                targetState = currentTab.value,
-                transitionSpec = { NavigationAnimation.tabContentTransition() },
-                label = "MainTabContent",
-            ) { tab ->
-                tabStateHolder.SaveableStateProvider(tab) {
-                    when (tab) {
-                        assetsRoute -> AssetsScreen(
-                            onAction = { action ->
-                                when (action) {
-                                    AssetsAction.ShowWallets -> navigator.openWallets()
-                                    AssetsAction.Manage -> navigator.openAssetsManage()
-                                    AssetsAction.Search -> navigator.openAssetsSearch()
-                                    AssetsAction.Send -> navigator.openRecipient()
-                                    AssetsAction.Receive -> navigator.openReceive()
-                                    AssetsAction.Buy -> navigator.openBuy()
-                                    AssetsAction.Swap -> navigator.openSwap()
-                                    AssetsAction.Portfolio -> navigator.openPortfolioChart()
-                                    AssetsAction.Perpetuals -> navigator.openPerpetuals()
-                                    is AssetsAction.OpenPerpetualDetails -> navigator.openPerpetualDetails(action.assetId)
-                                    is AssetsAction.OpenAsset -> navigator.openAsset(action.assetId)
-                                    AssetsAction.OpenCollections -> navigator.openNftList()
-                                    is AssetsAction.OpenNftCollection -> navigator.openNftCollection(action.collectionId)
-                                    is AssetsAction.OpenNftAsset -> navigator.openNftAsset(action.assetId)
-                                }
-                            },
-                            onContentReady = onWalletContentReady,
-                            listState = assetsListState,
-                            viewModel = assetsViewModel,
-                        )
-                        transactionsRoute -> TransactionsNavScreen(
-                            listState = activitiesListState,
-                            onTransaction = navigator::openTransaction,
-                            onBuy = navigator::openBuy,
-                            onReceive = navigator::openReceive,
-                        )
-                        else -> SettingsScene(
-                            scrollState = settingsScrollState,
-                            walletConnectEnabled = viewModel.isWalletConnectEnabled,
-                            onAction = { action ->
-                                when (action) {
-                                    SettingsSceneAction.Wallets -> navigator.openWallets()
-                                    SettingsSceneAction.Security -> navigator.openSecurity()
-                                    SettingsSceneAction.Notifications -> navigator.openNotifications()
-                                    SettingsSceneAction.Preferences -> navigator.openPreferences()
-                                    SettingsSceneAction.Bridges -> navigator.openBridgeConnections()
-                                    SettingsSceneAction.Support -> navigator.openSupport()
-                                    SettingsSceneAction.Referral -> navigator.openReferral()
-                                    SettingsSceneAction.AboutUs -> navigator.openAboutUs()
-                                    SettingsSceneAction.Develop -> navigator.openDevelop()
-                                }
-                            },
-                        )
+                AnimatedContent(
+                    targetState = currentTab.value,
+                    transitionSpec = { NavigationAnimation.tabContentTransition() },
+                    label = "MainTabContent",
+                ) { tab ->
+                    tabStateHolder.SaveableStateProvider(tab) {
+                        when (tab) {
+                            assetsRoute -> AssetsScreen(
+                                onAction = { action ->
+                                    when (action) {
+                                        AssetsAction.ShowWallets -> navigator.openWallets()
+                                        AssetsAction.Manage -> navigator.openAssetsManage()
+                                        AssetsAction.Search -> navigator.openAssetsSearch()
+                                        AssetsAction.Send -> navigator.openRecipient()
+                                        AssetsAction.Receive -> navigator.openReceive()
+                                        AssetsAction.Buy -> navigator.openBuy()
+                                        AssetsAction.Swap -> navigator.openSwap()
+                                        AssetsAction.Portfolio -> navigator.openPortfolioChart()
+                                        AssetsAction.Perpetuals -> navigator.openPerpetuals()
+                                        is AssetsAction.OpenPerpetualDetails -> navigator.openPerpetualDetails(action.assetId)
+                                        is AssetsAction.OpenAsset -> navigator.openAsset(action.assetId)
+                                        AssetsAction.OpenCollections -> navigator.openNftList()
+                                        is AssetsAction.OpenNftCollection -> navigator.openNftCollection(action.collectionId)
+                                        is AssetsAction.OpenNftAsset -> navigator.openNftAsset(action.assetId)
+                                    }
+                                },
+                                onContentReady = onWalletContentReady,
+                                listState = assetsListState,
+                                viewModel = assetsViewModel,
+                            )
+                            transactionsRoute -> TransactionsNavScreen(
+                                listState = activitiesListState,
+                                onTransaction = navigator::openTransaction,
+                                onBuy = navigator::openBuy,
+                                onReceive = navigator::openReceive,
+                            )
+                            vaultRoute -> VaultScreen() // Подключаем наш экран
+                            else -> SettingsScene(
+                                scrollState = settingsScrollState,
+                                walletConnectEnabled = viewModel.isWalletConnectEnabled,
+                                onAction = { action ->
+                                    when (action) {
+                                        SettingsSceneAction.Wallets -> navigator.openWallets()
+                                        SettingsSceneAction.Security -> navigator.openSecurity()
+                                        SettingsSceneAction.Notifications -> navigator.openNotifications()
+                                        SettingsSceneAction.Preferences -> navigator.openPreferences()
+                                        SettingsSceneAction.Bridges -> navigator.openBridgeConnections()
+                                        SettingsSceneAction.Support -> navigator.openSupport()
+                                        SettingsSceneAction.Referral -> navigator.openReferral()
+                                        SettingsSceneAction.AboutUs -> navigator.openAboutUs()
+                                        SettingsSceneAction.Develop -> navigator.openDevelop()
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
-            }
             }
         }
     }

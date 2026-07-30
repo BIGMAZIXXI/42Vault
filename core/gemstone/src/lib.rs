@@ -30,7 +30,6 @@ pub(crate) mod testkit;
 pub mod transaction_state;
 pub mod url_action;
 pub mod wallet_connect;
-// pub mod vault; // временно отключено для сборки
 
 use alien::AlienError;
 

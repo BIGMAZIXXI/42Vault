@@ -83,6 +83,9 @@ val bindgenKotlin = tasks.register<Exec>("bindgenKotlin") {
     inputs.file(gemstoneRoot.resolve("Cargo.toml"))
     outputs.dir(generatedKotlinDir.resolve("uniffi"))
     commandLine(justPath, "bindgen-kotlin")
+    environment = mapOf(
+        "PATH" to "/home/maksm/.cargo/bin:/usr/local/bin:/usr/bin:/bin"
+    )
 }
 
 val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
@@ -100,6 +103,9 @@ val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
         "build", "--lib",
         cargoBuildFlag ?: ""
     ).filter { it.isNotEmpty() }
+    environment = mapOf(
+        "PATH" to "/home/maksm/.cargo/bin:/usr/local/bin:/usr/bin:/bin"
+    )
 }
 
 tasks.configureEach {

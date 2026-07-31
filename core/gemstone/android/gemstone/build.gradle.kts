@@ -12,6 +12,10 @@ val jniLibsDir = project.projectDir.resolve("src/main/jniLibs")
 val generatedKotlinDir = project.projectDir.resolve("src/main/java")
 val cargoBuildFlag = if (System.getenv("BUILD_MODE") == "release") "--release" else null
 
+// Полные пути к утилитам внутри WSL
+val justPath = "/home/maksm/.cargo/bin/just"
+val cargoPath = "/home/maksm/.cargo/bin/cargo"
+
 android {
     namespace = "com.gemwallet.gemstone"
     compileSdk = 37
@@ -70,7 +74,7 @@ val bindgenKotlin = tasks.register<Exec>("bindgenKotlin") {
     inputs.dir(cratesDir)
     inputs.file(gemstoneRoot.resolve("Cargo.toml"))
     outputs.dir(generatedKotlinDir.resolve("uniffi"))
-    commandLine("just", "bindgen-kotlin")
+    commandLine(justPath, "bindgen-kotlin")
 }
 
 val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
@@ -82,7 +86,7 @@ val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
     inputs.property("cargoBuildFlag", cargoBuildFlag.orEmpty())
     outputs.dir(jniLibsDir)
     commandLine(
-        "cargo", "ndk",
+        cargoPath, "ndk",
         "-t", "arm64-v8a",
         "-t", "armeabi-v7a",
         "-t", "x86_64",

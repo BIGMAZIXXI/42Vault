@@ -67,7 +67,8 @@ kotlin {
     }
 }
 
-val bindgenKotlin = tasks.register<Exec>("bindgenKotlin") {
+// Переименовали задачу
+val bindgenKotlinCustom = tasks.register<Exec>("bindgenKotlinCustom") {
     description = "Generate Kotlin bindings from gemstone via uniffi"
     workingDir = gemstoneRoot
     inputs.dir(rustSrcDir)
@@ -104,7 +105,7 @@ val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
 
 tasks.configureEach {
     if (name.matches(Regex("(compile|extract|source|javaDoc).*(Debug|Release).*"))) {
-        dependsOn(bindgenKotlin)
+        dependsOn(bindgenKotlinCustom) // изменено
     }
     if (name.matches(Regex("merge.*(Debug|Release).*JniLib.*"))) {
         dependsOn(buildCargoNdk)

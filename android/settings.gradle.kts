@@ -9,8 +9,8 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         maven {
-            url = uri("https://en-mirror.ir/repository/jitpack/")
-            name = "JitPackMirror"
+            url = uri("https://maven.aliyun.com/repository/public/")
+            name = "Aliyun"
         }
         maven {
             url = uri("https://jitpack.io")

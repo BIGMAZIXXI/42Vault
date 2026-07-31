@@ -1,36 +1,44 @@
-# 42Vault — Статус проекта
+# 42Vault — Статус проекта (актуально на 31.07.2026)
 
-## Выполнено
-- [x] Создан форк Gem Wallet
-- [x] Настроен репозиторий на GitHub
-- [x] Добавлен модуль `vault` в Rust-ядро (`core/gemstone/src/vault/`)
-- [x] Добавлены файлы: `lock_manager.rs`, `ntp_client.rs`, `time_validator.rs`, `mod.rs`
-- [x] Зарегистрирован модуль в `lib.rs`
-- [x] Создан Android-слой: `LockStorage.kt`, `SecurityGuard.kt`, `VaultViewModel.kt`, `VaultScreen.kt`
-- [x] Vault интегрирован в навигацию (четвёртая вкладка)
-- [x] Исправлены ошибки компиляции для Windows:
-  - `file_io.rs` — добавлена условная компиляция (unix/not(unix))
-  - `build.gradle.kts` — добавлены environment с PATH, TEMP, TMP
-- [x] Установлены цели для Android: `aarch64-linux-android`, `armv7-linux-androideabi`, `i686-linux-android`, `x86_64-linux-android`
-- [x] Установлен `cargo-ndk`
-- [x] Установлен `just`
+## 🎯 Цель
+Разработать криптокошелёк с функцией принудительной блокировки активов на базе Gem Wallet.
 
-## Текущая задача
-- Сборка проекта (осталось установить Visual Studio Build Tools для `link.exe`)
+## ✅ Выполнено
+- Форкнут репозиторий Gem Wallet.
+- Создан модуль `vault` в `core/gemstone/src/vault/`:
+  - `mod.rs`
+  - `lock_manager.rs`
+  - `ntp_client.rs`
+  - `time_validator.rs`
+- Модуль `vault` отключён в `lib.rs` (закомментирован) для сохранения работоспособности базового кода.
+- Восстановлены оригинальные файлы `Cargo.toml` и `lib.rs` из репозитория Gem Wallet.
+- Добавлены недостающие зависимости в `Cargo.toml` (`uniffi`, `gem_client`).
+- Создан Android-слой:
+  - `LockStorage.kt`
+  - `SecurityGuard.kt`
+  - `VaultViewModel.kt`
+  - `VaultScreen.kt`
+- Vault интегрирован в навигацию (четвёртая вкладка).
+- Добавлен GitHub Actions workflow для сборки APK.
 
-## Следующие шаги
-1. Установить Visual Studio Build Tools (через `winget` или вручную)
-2. Проверить сборку
-3. Запустить приложение на Android
+## ❌ Текущие проблемы
+- Сборка в CI падает с ошибками, не связанными с нашим кодом:
+  - Конфликт версий `num_bigint` (0.4.8 и 0.5.1).
+  - Ошибки размера `str` в `keystore`.
+  - Отсутствие `uniffi` в некоторых модулях (хотя он добавлен в `Cargo.toml`).
+- Возможно, нужна специфическая версия Rust или настройки окружения.
 
-## Ключевые файлы
-- Rust: `core/gemstone/src/vault/`
-- Android: `android/app/src/main/java/com/gemwallet/app/vault/`
-- Навигация: `android/app/src/main/kotlin/com/gemwallet/android/ui/navigation/WalletNavGraph.kt`
-- Нижнее меню: `android/app/src/main/kotlin/com/gemwallet/android/features/main/views/MainScreen.kt`
-- Конфиг сборки: `android/gemstone/build.gradle.kts`
-- Исправленный `file_io.rs`: `core/crates/gem_keystore/src/storage/file_io.rs`
+## 🧩 Следующие шаги (после восстановления контекста)
+1. Попробовать собрать локально через WSL для детальной отладки.
+2. Либо обновить зависимости до совместимых версий.
+3. Либо временно закомментировать проблемные части (например, `keystore`), чтобы проверить работу вкладки Vault.
 
-## Текущие ошибки
-- `just` не может создать временную папку (добавлены `TEMP` и `TMP` в environment)
-- `link.exe` не найден (нужен Visual Studio Build Tools)
+## 📂 Ключевые файлы и папки
+- `core/gemstone/src/vault/` — наш модуль (отключён).
+- `android/app/src/main/java/com/gemwallet/app/vault/` — Android-слой.
+- `android/app/src/main/kotlin/com/gemwallet/android/ui/navigation/` — навигация.
+- `core/gemstone/Cargo.toml` — зависимости.
+- `.github/workflows/build.yml` — CI сборка.
+
+## 🔗 Ссылка на репозиторий
+https://github.com/BIGMAZIXXI/42Vault

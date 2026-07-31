@@ -22,16 +22,8 @@ val cargoNdkTargets = (System.getenv("GEMSTONE_ANDROID_ABIS") ?: defaultCargoNdk
     .filter { it.isNotEmpty() }
     .joinToString(" ") { "-t $it" }
 
-// Путь к bash из Git для Windows
-val bashPath = if (System.getProperty("os.name").startsWith("Windows")) {
-    "C:\\Program Files\\Git\\bin\\bash.exe"
-} else {
-    "/bin/sh"
-}
-
-// Полные пути к утилитам внутри WSL
-val justPath = "/home/maksm/.cargo/bin/just"
-val cargoPath = "/home/maksm/.cargo/bin/cargo"
+// Используем bash из WSL (login shell для загрузки .bashrc)
+val bashPath = "/bin/bash"
 
 android {
     namespace = "com.gemwallet.gemstone"
@@ -89,7 +81,7 @@ val bindgenKotlin = tasks.register<Exec>("bindgenKotlin") {
     inputs.dir(cratesDir)
     inputs.file(gemstoneRoot.resolve("Cargo.toml"))
     outputs.dir(generatedKotlinDir.resolve("uniffi"))
-    commandLine(bashPath, "-c", "$justPath bindgen-kotlin")
+    commandLine(bashPath, "-l", "-c", "just bindgen-kotlin")
 }
 
 val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
@@ -100,7 +92,7 @@ val buildCargoNdk = tasks.register<Exec>("buildCargoNdk") {
     inputs.file(gemstoneRoot.resolve("Cargo.toml"))
     inputs.property("cargoBuildFlag", cargoBuildFlag.orEmpty())
     outputs.dir(jniLibsDir)
-    commandLine(bashPath, "-c", "$cargoPath ndk $cargoNdkTargets -o ${jniLibsDir.absolutePath} build --lib ${cargoBuildFlag.orEmpty()}")
+    commandLine(bashPath, "-l", "-c", "cargo ndk $cargoNdkTargets -o ${jniLibsDir.absolutePath} build --lib ${cargoBuildFlag.orEmpty()}")
 }
 
 tasks.configureEach {

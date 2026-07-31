@@ -5,6 +5,27 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url = uri("https://en-mirror.ir/repository/jitpack/")
+            name = "JitPackMirror"
+        }
+        maven {
+            url = uri("https://jitpack.io")
+        }
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://repo1.maven.org/maven2/")
+        }
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+        }
+    }
+}
+
 rootProject.name = "wallet"
 
 include(":gemstone")

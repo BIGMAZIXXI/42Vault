@@ -1,37 +1,28 @@
-# 42Vault — Статус проекта (актуально на 31.07.2026)
+# 42Vault — Статус проекта (актуально на 31.07.2026, вечер)
 
 ## 🎯 Цель
 Разработать криптокошелёк с функцией принудительной блокировки активов на базе Gem Wallet.
 
 ## ✅ Выполнено
 - Форкнут репозиторий Gem Wallet.
-- Создан модуль `vault` в `core/gemstone/src/vault/`:
-  - `mod.rs`
-  - `lock_manager.rs`
-  - `ntp_client.rs`
-  - `time_validator.rs`
-- Модуль `vault` отключён в `lib.rs` (закомментирован) для сохранения работоспособности базового кода.
+- Создан модуль `vault` в `core/gemstone/src/vault/` (отключён в `lib.rs`).
 - Восстановлены оригинальные файлы `Cargo.toml` и `lib.rs` из репозитория Gem Wallet.
-- Добавлены недостающие зависимости в `Cargo.toml` (`uniffi`, `gem_client`).
-- Создан Android-слой:
-  - `LockStorage.kt`
-  - `SecurityGuard.kt`
-  - `VaultViewModel.kt`
-  - `VaultScreen.kt`
+- Создан Android-слой: `LockStorage.kt`, `SecurityGuard.kt`, `VaultViewModel.kt`, `VaultScreen.kt`.
 - Vault интегрирован в навигацию (четвёртая вкладка).
 - Добавлен GitHub Actions workflow для сборки APK.
+- Настроен WSL (Ubuntu) на локальной машине.
+- Установлены Rust, cargo-ndk, just, Java 17, Android SDK.
+- Проект клонирован в WSL.
 
-## ❌ Текущие проблемы
-- Сборка в CI падает с ошибками, не связанными с нашим кодом:
-  - Конфликт версий `num_bigint` (0.4.8 и 0.5.1).
-  - Ошибки размера `str` в `keystore`.
-  - Отсутствие `uniffi` в некоторых модулях (хотя он добавлен в `Cargo.toml`).
-- Возможно, нужна специфическая версия Rust или настройки окружения.
+## ⚠️ Текущая проблема
+- Сборка в WSL падает с ошибкой `SDK location not found`. Нужно корректно указать путь к Android SDK в `local.properties` или через `ANDROID_HOME`.
+- Возможно, SDK установлен не полностью (не хватает платформ и build-tools).
 
 ## 🧩 Следующие шаги (после восстановления контекста)
-1. Попробовать собрать локально через WSL для детальной отладки.
-2. Либо обновить зависимости до совместимых версий.
-3. Либо временно закомментировать проблемные части (например, `keystore`), чтобы проверить работу вкладки Vault.
+1. Установить недостающие компоненты Android SDK (platforms, build-tools, ndk) через `sdkmanager`.
+2. Убедиться, что `local.properties` содержит правильный `sdk.dir`.
+3. Попробовать собрать APK снова.
+4. Если сборка пройдёт — протестировать приложение на устройстве.
 
 ## 📂 Ключевые файлы и папки
 - `core/gemstone/src/vault/` — наш модуль (отключён).
@@ -42,3 +33,13 @@
 
 ## 🔗 Ссылка на репозиторий
 https://github.com/BIGMAZIXXI/42Vault
+
+## 📌 Команды для следующего шага (в PowerShell)
+# Установка компонентов SDK
+wsl -d Ubuntu -- bash -c "yes | sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;26.1.10909125'"
+
+# Проверка пути SDK
+wsl -d Ubuntu -- bash -c "ls -la /usr/lib/android-sdk"
+
+# Создание local.properties и сборка
+wsl -d Ubuntu -- bash -c "echo 'sdk.dir=/usr/lib/android-sdk' > ~/42Vault/android/local.properties && cd ~/42Vault/android && ./gradlew assembleDebug"
